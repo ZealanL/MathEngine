@@ -25,8 +25,8 @@ a * (1/a) = 1
 
 # Identity
 a/1 = a
-a/a = 1
-0/a = 0
+#a/a = 1 TODO: a != 0
+#0/a = 0 TODO: a != 0
 
 # Signs
 -(a/b) = (-a)/b

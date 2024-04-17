@@ -37,6 +37,10 @@ void IdentityDB::Load(std::filesystem::path path) {
 			ERR_CLOSE(L_PREFIX << "Invalid identity \"" << line << "\", failed to parse: " << e.what());
 		}
 
+		// Add identity and swapped identity
+		RASSERT(identity.children.size() == 2);
+		identities.push_back(identity);
+		std::swap(identity.children[0], identity.children[1]);
 		identities.push_back(identity);
 	}
 

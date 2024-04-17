@@ -63,3 +63,8 @@ friend std::ostream& operator <<(std::ostream& s, const type& val) { \
 	s << val.ToString(); \
 	return s; \
 }
+
+#define ASSERT assert
+
+// Release-mode assert
+#define RASSERT(cond) { if (!cond) { ERR("Assertion failed: \"" #cond "\""); }}

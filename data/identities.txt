@@ -1,1 +1,56 @@
-a+a = 3a
+########## Addition ##########
+
+a + (b + c) = (a + b) + c # Associative
+a + b = b + a # Communative
+a + 0 = 0 # Identity
+a + -a = 0 # Inverse
+
+########## Multiplication ##########
+
+# Associative
+a * (b * c) = (a * b) * c 
+
+# Communative
+a * b = b * a
+
+# Identity
+a * 0 = 0
+a * 1 = a
+a * -1 = -a # TODO: Why not make negation multiplication by negative 1 internally?
+
+# Inverse
+a * (1/a) = 1
+
+########## Division ##########
+
+# Identity
+a/1 = a
+a/a = 1
+0/a = 0
+
+# Signs
+-(a/b) = (-a)/b
+
+# Multiplying
+a/b = (ac)/(bc)
+
+# Common denominators
+(a+b)/c = a/c + b/c
+a/b + c/d = (ad)/(bd) + (bc)/(bd)
+
+# Multiplication conversion
+a/b = a * (1/b)
+a/(1/b) = a*b 
+
+########## Exponentiation ##########
+
+# Identity
+a^0 = 1
+a^1 = a
+1^a = 1
+
+# Distributing to chained multiplication
+a^b = a^(b-1) * a 
+
+# Negative exponents
+a^b = 1 / (a^-b)

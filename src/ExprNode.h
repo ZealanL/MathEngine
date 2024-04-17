@@ -1,6 +1,6 @@
 #pragma once
-#include "Value.h"
-#include "Operator.h"
+#include "BaseTypes/Value.h"
+#include "BaseTypes/Operator.h"
 
 // Expression node
 // Used to construct expression trees

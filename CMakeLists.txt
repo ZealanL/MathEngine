@@ -13,7 +13,6 @@ set_target_properties(MathEngine PROPERTIES CXX_STANDARD 20)
 
 # Add all data files to copy over to build dir
 file(GLOB_RECURSE FILES_DATA "data/*")
-message("Files data: ${FILES_DATA}")
 foreach(FILE IN LISTS FILES_DATA)
 	# Make absolute path relative
 	string(REPLACE ${CMAKE_CURRENT_SOURCE_DIR} "" FILE_REL ${FILE})
@@ -23,6 +22,5 @@ foreach(FILE IN LISTS FILES_DATA)
                 ${CMAKE_SOURCE_DIR}/${FILE_REL}
                 ${CMAKE_CURRENT_BINARY_DIR}/${FILE_REL})
 
-	message("File: ${FILE_REL}")
 	configure_file(${FILE} ${FILE_REL})
 endforeach()

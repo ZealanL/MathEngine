@@ -2,7 +2,7 @@
 
 a + (b + c) = (a + b) + c # Associative
 a + b = b + a # Communative
-a + 0 = 0 # Identity
+a + 0 = a # Identity
 a + -a = 0 # Inverse
 
 ########## Multiplication ##########

@@ -57,7 +57,12 @@ std::string ExprNode::_ChildToString(int index) const {
 		if (IS_OP_UNARY(child.op)) {
 			needsParens = OP_PREC[child.op] < OP_PREC[this->op];
 		} else {
-			needsParens = OP_PREC[child.op] != OP_PREC[this->op];
+			if (OP_PREC[child.op] != OP_PREC[this->op]) {
+				needsParens = true;
+			} else {
+				// Make sure to add parentheses to "a ? (a ? a)"
+				needsParens = index > 0;
+			}
 		}
 	}
 

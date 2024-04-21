@@ -21,6 +21,9 @@ a * -1 = -a # TODO: Why not make negation multiplication by negative 1 internall
 # Inverse
 a * (1/a) = 1
 
+# Distributive
+(a + b) * c = ac + bc
+
 ########## Division ##########
 
 # Identity
@@ -41,6 +44,9 @@ a/b + c/d = (ad)/(bd) + (bc)/(bd)
 # Multiplication conversion
 a/b = a * (1/b)
 a/(1/b) = a*b 
+
+# Distributive
+a/c + b/c = (a + b) / c
 
 ########## Exponentiation ##########
 

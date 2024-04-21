@@ -67,4 +67,4 @@ friend std::ostream& operator <<(std::ostream& s, const type& val) { \
 #define ASSERT assert
 
 // Release-mode assert
-#define RASSERT(cond) { if (!cond) { ERR("Assertion failed: \"" #cond "\""); }}
+#define RASSERT(cond) { if (!(cond)) { ERR("Assertion failed: \"" #cond "\""); }}

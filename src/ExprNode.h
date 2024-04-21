@@ -43,6 +43,10 @@ struct ExprNode {
 		return !(*this == other);
 	}
 
+	bool Exists() const {
+		return op || !IsLeaf() || val.Defined();
+	}
+
 	void AddChild(const ExprNode& child, size_t index) {
 		children.insert(children.begin() + index, child);
 	}

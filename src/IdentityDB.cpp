@@ -3,17 +3,104 @@
 
 IdentityDB g_IdentityDB = {};
 
+bool FufillsRecursive(const ExprNode& a, const ExprNode& b) {
+	if (!a.IsLeaf()) {
+
+		if (a.op != b.op)
+			return false;
+
+		if (a.children.size() == b.children.size()) {
+
+			for (int i = 0; i < a.children.size(); i++)
+				if (!FufillsRecursive(a.children[i], b.children[i]))
+					return false;
+
+		} else {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+bool Identity::Fufills(const ExprNode& expr) const {
+
+	if (!Valid())
+		return true;
+
+	return FufillsRecursive(lhs, expr);
+}
+
+//////////////////////////////////////////////////////
+
+void IdentityTree::AddIdentity(const Identity& identity) {
+
+	Node asNode = { identity };
+
+	for (auto& root : roots) {
+		if (root.TryAdd(asNode))
+			return;
+	}
+
+	roots.push_back(asNode);
+}
+
+bool IdentityTree::Node::TryAdd(Node& node) {
+
+	if (!identity.Valid()) {
+		*this = node;
+		return true;
+	}
+
+	bool fufills = identity.Fufills(node.identity.lhs);
+	bool backwardsFufills = node.identity.Fufills(identity.lhs);
+
+	if (backwardsFufills) {
+		if (!fufills) {
+			// Order should be swapped
+			std::swap(*this, node);
+			return true;
+		} else {
+			// Equal
+			return false;
+		}
+	}
+
+	if (fufills) {
+		for (auto& child : children) {
+			if (child.TryAdd(node))
+				return true;
+		}
+
+		children.push_back(node);
+		return true;
+	} else {
+		return false;
+	}
+}
+
+void IdentityTree::Node::_PrintRecursive(std::stringstream& stream, int level) const {
+	std::string indent = std::string(level * 2, ' ');
+	stream << indent << "> " << identity << std::endl;
+	for (auto& child : children)
+		child._PrintRecursive(stream, level + 1);
+}
+
+
+//////////////////////////////////////////////////////
+
 void IdentityDB::Load(std::filesystem::path path) {
 	constexpr const char* L_PREFIX = "IdentityDB::Load(): ";
 
 	LOG(L_PREFIX << "Loading identities from " << path << "...");
-	size_t amountBefore = identities.size();
 
 	std::ifstream stream = std::ifstream(path);
 	stream >> std::noskipws;
 
 	if (!stream.good())
 		ERR(L_PREFIX << "Failed to open file " << path);
+
+	size_t numLoaded = 0;
 
 	std::string line;
 	while (std::getline(stream, line)) {
@@ -28,23 +115,22 @@ void IdentityDB::Load(std::filesystem::path path) {
 		if (isBlank)
 			continue;
 
-		ExprNode identity = {};
+		ExprNode identityExpr = {};
 		try {
-			identity = ExprParser::Parse(line);
-			if (identity.op != OP_EQ)
+			identityExpr = ExprParser::Parse(line);
+			if (identityExpr.op != OP_EQ)
 				ERR("Identity must contain a top-level equal sign");
 		} catch (std::exception& e) {
 			ERR_CLOSE(L_PREFIX << "Invalid identity \"" << line << "\", failed to parse: " << e.what());
 		}
-
 		// Add identity and swapped identity
-		RASSERT(identity.children.size() == 2);
-		identities.push_back(identity);
-		std::swap(identity.children[0], identity.children[1]);
-		identities.push_back(identity);
+		RASSERT(identityExpr.children.size() == 2);
+		identities.AddIdentity(Identity(identityExpr.children[0], identityExpr.children[1]));
+		identities.AddIdentity(Identity(identityExpr.children[1], identityExpr.children[0]));
+		numLoaded++;
 	}
 
-	LOG(L_PREFIX << (identities.size() - amountBefore) << " identities loaded.");
+	LOG(L_PREFIX << numLoaded << " identities loaded.");
 }
 
 // Each variable can only have 1 value in an identity
@@ -92,16 +178,26 @@ bool IdentityMatchesRecursive(const ExprNode& expr, const ExprNode& identity, Id
 	return true;
 }
 
-std::vector<const ExprNode*> IdentityDB::FindIdentities(const ExprNode& expr) {
-	std::vector<const ExprNode*> result = {};
+void CollectPotentialIdentitiesRecursive(const ExprNode& expr, const IdentityTree::Node& identityNode, std::vector<const Identity*>& identities) {
+	if (identityNode.identity.Fufills(expr)) {
+		identities.push_back(&identityNode.identity);
+		for (auto& subNode : identityNode.children)
+			CollectPotentialIdentitiesRecursive(expr, subNode, identities);
+	}
+}
 
-	// TODO: Very slow O(n)
-	for (auto& identity : identities) {
-		IdentityVarMap ivm = {};
-		auto& lhs = identity.children[0];
-		if (IdentityMatchesRecursive(expr, lhs, ivm))
-			result.push_back(&identity);
+std::vector<const Identity*> IdentityDB::FindIdentities(const ExprNode& expr) {
+	std::vector<const Identity*> potentials = {};
+	for (auto& root : g_IdentityDB.identities.roots) {
+		CollectPotentialIdentitiesRecursive(expr, root, potentials);
 	}
 
+	std::vector<const Identity*> result = {};
+	for (auto potential : potentials) {
+		IdentityVarMap ivm = {};
+		if (IdentityMatchesRecursive(expr, potential->lhs, ivm))
+			result.push_back(potential);
+	}
+	
 	return result;
 }

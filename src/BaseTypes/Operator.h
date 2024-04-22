@@ -13,7 +13,7 @@ enum {
 
 	OP_MUL, OP_DIV,
 
-	OP_POW, OP_ROOT,
+	OP_POW,
 
 	OPERATOR_AMOUNT
 };
@@ -52,7 +52,7 @@ constexpr int OP_PREC[OPERATOR_AMOUNT] = {
 
 	13, 13,
 
-	15, 16,
+	15,
 };
 constexpr int PREC_MAX = 100;
 
@@ -67,5 +67,5 @@ constexpr const char* OP_STR[OPERATOR_AMOUNT] = {
 
 	"*", "/",
 
-	"^", "rt",
+	"^",
 };

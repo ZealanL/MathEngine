@@ -53,10 +53,17 @@ a/c + b/c = (a + b) / c
 # Identity
 a^0 = 1
 a^1 = a
-1^a = 1
+1^n = 1
 
 # Distributing to chained multiplication
-a^b = a^(b-1) * a 
+a^n = a^(n-1) * a 
 
-# Negative exponents
-a^b = 1 / (a^-b)
+# https://study.com/cimages/multimages/16/fig_3672453610470264834.jpg
+a^n = 1 / (a^-n) # Negative exponents
+a^n * a^m = a^(n+m) # Product of powers 
+(a^n)^m = a^(n+m) # Power of a power
+(a^n) / (a^m) = a^(n-m) # Quotient powers
+
+# Distributive
+(a * b)^n = (a^n) * (b^n)
+(a / b)^n = (a^n) / (b^n)

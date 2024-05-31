@@ -61,8 +61,11 @@ typedef std::unordered_map<int64_t, const ExprNode*> IdentityVarMap;
 class IdentityDB {
 protected:
 	IdentityTree identities;
+	std::vector<Identity> allIdentities;
 
 public:
+	static bool IdentityMatchesRecursive(const ExprNode& expr, const ExprNode& identity, IdentityVarMap& ivm);
+
 	void Load(std::filesystem::path path);
 	std::vector<std::pair<const Identity*, IdentityVarMap>> FindIdentities(const ExprNode& expr);
 };

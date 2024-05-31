@@ -151,15 +151,20 @@ void IdentityDB::Load(std::filesystem::path path) {
 		}
 		// Add identity and swapped identity
 		RASSERT(identityExpr.children.size() == 2);
-		identities.AddIdentity(Identity(identityExpr.children[0], identityExpr.children[1]));
-		identities.AddIdentity(Identity(identityExpr.children[1], identityExpr.children[0]));
+
+		auto a = Identity(identityExpr.children[0], identityExpr.children[1]);
+		auto b = Identity(identityExpr.children[1], identityExpr.children[0]);
+		identities.AddIdentity(a);
+		identities.AddIdentity(b);
+		allIdentities.push_back(a);
+		allIdentities.push_back(b);
 		numLoaded++;
 	}
 
 	LOG(L_PREFIX << numLoaded << " identities loaded.");
 }
 
-bool IdentityMatchesRecursive(const ExprNode& expr, const ExprNode& identity, IdentityVarMap& ivm) {
+bool IdentityDB::IdentityMatchesRecursive(const ExprNode& expr, const ExprNode& identity, IdentityVarMap& ivm) {
 
 	if (identity.IsLeafVal()) {
 		// Identity is at a leaf

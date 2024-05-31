@@ -32,6 +32,10 @@
 #include <cmath>
 #include <math.h>
 
+#ifdef _DEBUG
+#define ME_DEBUG
+#endif
+
 #define MAX(a, b) ((a > b) ? a : b)
 #define MIN(a, b) ((a < b) ? a : b)
 
@@ -47,9 +51,10 @@
 #define STR(s) ([=]{ std::stringstream __macroStream; __macroStream << s; return __macroStream.str(); }())
 
 #define ERR_CLOSE(s) { \
-	std::string _errorStr = STR("FATAL ERROR: " << s); \
-	LOG(_errorStr); \
-	throw std::runtime_error(_errorStr); \
+	std::stringstream _errorStream; \
+	_errorStream << "FATAL ERROR: " << s; \
+	LOG(_errorStream.str()); \
+	throw std::runtime_error(_errorStream.str()); \
 	exit(EXIT_FAILURE); \
 }
 

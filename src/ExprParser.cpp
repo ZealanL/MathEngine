@@ -163,8 +163,11 @@ ExprNode TokensToExprNode(const std::vector<std::string>& tokens) {
 			ExprNode numNode = ExprNode(Int::FromString(token));
 			curNode->AddChild(numNode);
 		} else if (isalpha(c)) {
-			ExprNode varNode = ExprNode(Variable(token));
-			curNode->AddChild(varNode);
+			// TODO: Temporary, eventually there will be multi-letter variable names
+			for (char subChar : token) {
+				ExprNode varNode = ExprNode(Variable(std::string(1, subChar)));
+				curNode->AddChild(varNode);
+			}
 		} else if (token == "(") {
 			curNode->AddChild({});
 			curNodes.push(&curNode->children.back());

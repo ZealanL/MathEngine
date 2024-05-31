@@ -3,6 +3,31 @@
 
 IdentityDB g_IdentityDB = {};
 
+/////////////////////////////////////////////////////
+
+Identity::Identity(const ExprNode& lhs, const ExprNode& rhs) 
+	: lhs(lhs), rhs(rhs) {
+
+	// Find all var hashes in lhs
+	std::unordered_set<uint64_t> varsInLhs;
+	lhs.ApplyRecursive(
+		[&](const ExprNode* node) {
+			if (node->IsVal() && node->val.IsVar())
+				varsInLhs.insert(node->val.varVal.GetHash());
+		}
+	);
+
+	// If any don't exist in lhs, mark generative
+	this->isGenerative = false;
+	rhs.ApplyRecursive(
+		[&](const ExprNode* node) {
+			if (node->IsVal() && node->val.IsVar())
+				if (varsInLhs.find(node->val.varVal.GetHash()) == varsInLhs.end())
+					this->isGenerative = true;
+		}
+	);
+}
+
 bool FufillsRecursive(const ExprNode& a, const ExprNode& b) {
 	if (!a.IsLeaf()) {
 
@@ -22,6 +47,7 @@ bool FufillsRecursive(const ExprNode& a, const ExprNode& b) {
 
 	return true;
 }
+
 
 bool Identity::Fufills(const ExprNode& expr) const {
 

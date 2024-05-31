@@ -59,10 +59,19 @@ struct ExprNode {
 		children.erase(children.begin() + index);
 	}
 
+	// TODO: Replace with iterator, maybe?
 	void ApplyRecursive(std::function<void(const ExprNode*)> func) const {
 		func(this);
 		for (auto& child : children)
-			func(&child);
+			child.ApplyRecursive(func);
+	}
+
+	int CalcTreeSize() const {
+		// I *would* use ApplyRecursive but I don't trust the compiler enough to optimize it
+		int size = 0;
+		for (auto& child : children)
+			size += 1 + child.CalcTreeSize();
+		return size;
 	}
 
 	std::string ToString() const;

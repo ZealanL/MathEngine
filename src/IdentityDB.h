@@ -5,6 +5,12 @@ struct Identity {
 	ExprNode lhs = {}, rhs = {};
 	std::vector<Identity> children;
 
+	// If the rhs introduces a new variable not present in the lhs
+	bool isGenerative = false;
+
+	Identity() = default;
+	Identity(const ExprNode& lhs, const ExprNode& rhs);
+
 	// If expr fufills the operators of the lhs
 	// E.x.: "x+(x*x)" fufills "x+x"
 	// E.x.: "x+x" does not fufill "x*x"

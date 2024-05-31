@@ -1,6 +1,6 @@
 #include "ExprManip.h"
 
-void ApplyIdentityRecursive(ExprNode& appliedIdentity, const IdentityVarMap& ivm) {
+void ApplyIdentityRecursive(const Identity* identity, ExprNode& appliedIdentity, const IdentityVarMap& ivm) {
 
 	if (appliedIdentity.IsLeafVal()) {
 		// Identity is at a leaf
@@ -12,11 +12,7 @@ void ApplyIdentityRecursive(ExprNode& appliedIdentity, const IdentityVarMap& ivm
 
 #ifdef ME_DEBUG
 			if (ivm.find(varHash) == ivm.end()) {
-				std::stringstream mapPrintout;
-				for (auto& pair : ivm) {
-					mapPrintout << " > " << pair.first << ", " << *pair.second << std::endl;
-				}
-				ERR_CLOSE("ApplyIdentityRecursive(): Failed to find \"" << appliedIdentity.val.varVal << "\" in map:\n" << mapPrintout.str());
+				ERR_CLOSE("ApplyIdentityRecursive(): Failed to find \"" << appliedIdentity.val.varVal << "\" for identity \"" << *identity << "\"");
 			}
 #endif
 
@@ -26,13 +22,13 @@ void ApplyIdentityRecursive(ExprNode& appliedIdentity, const IdentityVarMap& ivm
 		}
 	} else {
 		for (auto& child : appliedIdentity.children)
-			ApplyIdentityRecursive(child, ivm);
+			ApplyIdentityRecursive(identity, child, ivm);
 	}
 }
 
 ExprNode ExprManip::ApplyIdentity(const Identity* identity, const IdentityVarMap& ivm) {
 	ExprNode appliedIdentity = identity->rhs;
-	ApplyIdentityRecursive(appliedIdentity, ivm);
+	ApplyIdentityRecursive(identity, appliedIdentity, ivm);
 	return appliedIdentity;
 }
 

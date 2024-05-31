@@ -133,11 +133,6 @@ void IdentityDB::Load(std::filesystem::path path) {
 	LOG(L_PREFIX << numLoaded << " identities loaded.");
 }
 
-// Each variable can only have 1 value in an identity
-// For instance, in the identity "a+a = 2a", 'a' must be equal to all other 'a's
-// So when we are checking an identity, we need to keep track of what each variable is as we go
-typedef std::unordered_map<int64_t, const ExprNode*> IdentityVarMap;
-
 bool IdentityMatchesRecursive(const ExprNode& expr, const ExprNode& identity, IdentityVarMap& ivm) {
 
 	if (identity.IsLeafVal()) {
@@ -186,17 +181,17 @@ void CollectPotentialIdentitiesRecursive(const ExprNode& expr, const IdentityTre
 	}
 }
 
-std::vector<const Identity*> IdentityDB::FindIdentities(const ExprNode& expr) {
+std::vector<std::pair<const Identity*, IdentityVarMap>> IdentityDB::FindIdentities(const ExprNode& expr) {
 	std::vector<const Identity*> potentials = {};
 	for (auto& root : g_IdentityDB.identities.roots) {
 		CollectPotentialIdentitiesRecursive(expr, root, potentials);
 	}
 
-	std::vector<const Identity*> result = {};
+	std::vector<std::pair<const Identity*, IdentityVarMap>> result = {};
 	for (auto potential : potentials) {
 		IdentityVarMap ivm = {};
 		if (IdentityMatchesRecursive(expr, potential->lhs, ivm))
-			result.push_back(potential);
+			result.push_back({ potential, ivm });
 	}
 	
 	return result;

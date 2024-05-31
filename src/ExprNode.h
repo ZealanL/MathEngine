@@ -59,6 +59,12 @@ struct ExprNode {
 		children.erase(children.begin() + index);
 	}
 
+	void ApplyRecursive(std::function<void(const ExprNode*)> func) const {
+		func(this);
+		for (auto& child : children)
+			func(&child);
+	}
+
 	std::string ToString() const;
 	PRINTABLE(ExprNode);
 

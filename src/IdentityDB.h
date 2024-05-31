@@ -46,6 +46,11 @@ struct IdentityTree {
 	PRINTABLE(IdentityTree);
 };
 
+// Each variable can only have 1 value in an identity
+// For instance, in the identity "a+a = 2a", 'a' must be equal to all other 'a's
+// So when we are checking an identity, we need to keep track of what each variable is as we go
+typedef std::unordered_map<int64_t, const ExprNode*> IdentityVarMap;
+
 // Database holding identities
 class IdentityDB {
 protected:
@@ -53,7 +58,7 @@ protected:
 
 public:
 	void Load(std::filesystem::path path);
-	std::vector<const Identity*> FindIdentities(const ExprNode& expr);
+	std::vector<std::pair<const Identity*, IdentityVarMap>> FindIdentities(const ExprNode& expr);
 };
 
 extern IdentityDB g_IdentityDB;

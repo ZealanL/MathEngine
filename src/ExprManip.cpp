@@ -1,5 +1,41 @@
 #include "ExprManip.h"
 
+void ApplyIdentityRecursive(ExprNode& appliedIdentity, const IdentityVarMap& ivm) {
+
+	if (appliedIdentity.IsLeafVal()) {
+		// Identity is at a leaf
+		// It expects a value
+
+		// Identity wants any variable
+		if (appliedIdentity.val.IsVar()) {
+			auto varHash = appliedIdentity.val.varVal.GetHash();
+
+#ifdef ME_DEBUG
+			if (ivm.find(varHash) == ivm.end()) {
+				std::stringstream mapPrintout;
+				for (auto& pair : ivm) {
+					mapPrintout << " > " << pair.first << ", " << *pair.second << std::endl;
+				}
+				ERR_CLOSE("ApplyIdentityRecursive(): Failed to find \"" << appliedIdentity.val.varVal << "\" in map:\n" << mapPrintout.str());
+			}
+#endif
+
+			auto& mappedNode = ivm.at(varHash);
+
+			appliedIdentity = *mappedNode;
+		}
+	} else {
+		for (auto& child : appliedIdentity.children)
+			ApplyIdentityRecursive(child, ivm);
+	}
+}
+
+ExprNode ExprManip::ApplyIdentity(const Identity* identity, const IdentityVarMap& ivm) {
+	ExprNode appliedIdentity = identity->rhs;
+	ApplyIdentityRecursive(appliedIdentity, ivm);
+	return appliedIdentity;
+}
+
 ExprNode ExprManip::Simplify(const ExprNode& expr) {
 	
 	ExprNode result = expr;

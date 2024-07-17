@@ -101,3 +101,28 @@ bool ExprManip::SimplifyNumbers(ExprNode& expr) {
 
 	return false;
 }
+
+std::vector<ExprNode> ExprManip::FindTransformations(const ExprNode& expr) {
+	std::vector<ExprNode> results = {};
+	auto identities = g_IdentityDB.FindIdentities(expr);
+	for (auto& pair : identities) {
+		if (pair.first->isGenerative)
+			continue;
+		ExprNode result = ExprManip::ApplyIdentity(pair.first, pair.second);
+		ExprManip::SimplifyNumbers(result);
+		results.push_back(result);
+	}
+
+	for (int i = 0; i < expr.children.size(); i++) {
+		auto& childExpr = expr.children[i];
+		auto subTransforms = FindTransformations(childExpr);
+		for (auto& transformed : subTransforms) {
+			ExprNode newExpr = expr;
+			newExpr.children[i] = transformed;
+			ExprManip::SimplifyNumbers(newExpr);
+			results.push_back(newExpr);
+		}
+	}
+
+	return results;
+}

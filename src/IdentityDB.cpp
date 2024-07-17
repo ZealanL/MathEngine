@@ -205,18 +205,20 @@ bool IdentityDB::IdentityMatchesRecursive(const ExprNode& expr, const ExprNode& 
 }
 
 void CollectPotentialIdentitiesRecursive(const ExprNode& expr, const IdentityTree::Node& identityNode, std::vector<const Identity*>& identities) {
-	if (identityNode.identity.Fufills(expr)) {
+	if (identityNode.identity.Fufills(expr))
 		identities.push_back(&identityNode.identity);
-		for (auto& subNode : identityNode.children)
-			CollectPotentialIdentitiesRecursive(expr, subNode, identities);
-	}
+	
+	for (auto& subNode : identityNode.children)
+		CollectPotentialIdentitiesRecursive(expr, subNode, identities);
 }
 
 std::vector<std::pair<const Identity*, IdentityVarMap>> IdentityDB::FindIdentities(const ExprNode& expr) {
+	if (expr.IsLeaf())
+		return {};
+
 	std::vector<const Identity*> potentials = {};
-	for (auto& root : g_IdentityDB.identities.roots) {
+	for (auto& root : g_IdentityDB.identities.roots)
 		CollectPotentialIdentitiesRecursive(expr, root, potentials);
-	}
 
 	std::vector<std::pair<const Identity*, IdentityVarMap>> result = {};
 	for (auto potential : potentials) {

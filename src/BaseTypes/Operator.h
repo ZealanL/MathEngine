@@ -38,6 +38,10 @@ constexpr int UNARY_OP_DIRECTION(int op) {
 	}
 }
 
+constexpr bool IS_OP_COMMUNATIVE(int op) {
+	return op == OP_ADD || op == OP_MUL;
+}
+
 constexpr int OP_PREC[OPERATOR_AMOUNT] = {
 	0,
 

@@ -55,9 +55,12 @@ a/c + b/c = (a + b) / c
 a^0 = 1
 a^1 = a
 1^n = 1
+# TODO: 0^0 ?
 
-# Distributing to chained multiplication
+# Conversion
 a^n = a^(n-1) * a 
+a^n * a = a^(n+1)
+a^n / a = a^(n-1)
 
 # https://study.com/cimages/multimages/16/fig_3672453610470264834.jpg
 a^n = 1 / (a^-n) # Negative exponents

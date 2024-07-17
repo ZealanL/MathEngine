@@ -1,5 +1,17 @@
 #include "ExprNode.h"
 
+void ExprNode::UpdateHash() {
+	HashBuilder hb = HashBuilder(IsVal(), op, children.size());
+
+	for (int i = 0; i < children.size(); i++) {
+		hb.Add(i);
+		children[i].UpdateHash();
+		hb.Add(children[i].GetHash());
+	}
+
+	hash = hb.Get();
+}
+
 bool ExprNode::operator==(const ExprNode& other) const {
 	if (op != other.op)
 		return false;

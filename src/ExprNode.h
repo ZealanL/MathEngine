@@ -4,7 +4,11 @@
 
 // Expression node
 // Used to construct expression trees
-struct ExprNode {
+class ExprNode {
+protected:
+	uint64_t hash = 0;
+
+public:
 	Value val = {}; // Optional value, if this is a leaf node
 	int op = OP_NONE;
 	std::vector<ExprNode> children;
@@ -13,6 +17,9 @@ struct ExprNode {
 
 	explicit ExprNode(const Value& val) : val(val), op(OP_NONE) {}
 	explicit ExprNode(int op, const std::vector<ExprNode>& children) : op(op), children(children) {}
+
+	uint64_t GetHash() const { return hash; };
+	void UpdateHash();
 
 	bool IsLeaf() const { return children.empty(); }
 
@@ -71,6 +78,14 @@ struct ExprNode {
 		int size = 0;
 		for (auto& child : children)
 			size += 1 + child.CalcTreeSize();
+		return size;
+	}
+
+	int CalcTreeDepth() const {
+		// I *would* use ApplyRecursive but I don't trust the compiler enough to optimize it
+		int size = 1;
+		for (auto& child : children)
+			size = MAX(size, 1 + child.CalcTreeDepth());
 		return size;
 	}
 

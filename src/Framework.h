@@ -32,6 +32,8 @@
 #include <cmath>
 #include <math.h>
 
+using std::byte;
+
 #ifdef _DEBUG
 #define ME_DEBUG
 #endif

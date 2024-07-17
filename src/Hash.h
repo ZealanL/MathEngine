@@ -14,3 +14,32 @@ namespace Hash {
 		return HashBytes(str.data(), str.size());
 	}
 }
+
+struct HashBuilder {
+	std::vector<byte> bytes;
+
+	HashBuilder() = default;
+
+	template<typename... Args>
+	HashBuilder(Args... args) {
+		bytes = {};
+		//https://stackoverflow.com/questions/7230621/how-can-i-iterate-over-a-packed-variadic-template-argument-list
+		([&] { *this += args; } (), ...);
+	}
+
+	template<typename T>
+	void Add(const T& val) {
+		byte* asBytes = (byte*)&val;
+		bytes.insert(bytes.end(), asBytes, asBytes + sizeof(T));
+	}
+
+	template<typename T>
+	HashBuilder& operator +=(const T& val) {
+		Add(val);
+		return *this;
+	}
+
+	int64_t Get() const {
+		return Hash::HashBytes(bytes.data(), bytes.size());
+	}
+};

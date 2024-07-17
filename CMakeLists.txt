@@ -21,6 +21,4 @@ foreach(FILE IN LISTS FILES_DATA)
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
                 ${CMAKE_SOURCE_DIR}/${FILE_REL}
                 ${CMAKE_CURRENT_BINARY_DIR}/${FILE_REL})
-
-	configure_file(${FILE} ${FILE_REL})
 endforeach()

@@ -5,5 +5,5 @@
 namespace ExprManip {
 	ExprNode ApplyIdentity(const Identity* identity, const IdentityVarMap& ivm);
 
-	ExprNode Simplify(const ExprNode& expr);
+	bool SimplifyNumbers(ExprNode& expr);
 }

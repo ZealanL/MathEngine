@@ -32,31 +32,38 @@ ExprNode ExprManip::ApplyIdentity(const Identity* identity, const IdentityVarMap
 	return appliedIdentity;
 }
 
-ExprNode ExprManip::Simplify(const ExprNode& expr) {
+bool ExprManip::SimplifyNumbers(ExprNode& expr) {
 	
-	ExprNode result = expr;
+	for (ExprNode& child : expr.children)
+		if (SimplifyNumbers(child))
+			return true;
 
-	for (ExprNode& child : result.children)
-		child = Simplify(child);
-
-	if (result.op) {
-		int expectedChildren = IS_OP_UNARY(result.op) ? 1 : 2;
-		if (result.children.size() == expectedChildren) {
-			ExprNode* a = result[0];
-			ExprNode* b = result[1];
+	if (expr.op) {
+		int expectedChildren = IS_OP_UNARY(expr.op) ? 1 : 2;
+		if (expr.children.size() == expectedChildren) {
+			ExprNode* a = expr[0];
+			ExprNode* b = expr[1];
 
 			if (a->IsLeafVal() && a->val.IsInt() && (!b || (b->IsLeafVal() && b->val.IsInt()))) {
 				
-				if (result.op == OP_DIV) {
+				if (expr.op == OP_DIV) {
 
 					Int& av = a->val.intVal;
 					Int& bv = b->val.intVal;
 	
-					// Divide by greatest common diviser
-					Int gcd = Int::GCD(av, bv);
-					if (gcd != 0) {
-						av /= gcd;
-						bv /= gcd;
+					if (bv != 1) {
+						// Divide by greatest common diviser
+						Int gcd = Int::GCD(av, bv);
+						if (gcd != 0) {
+							av /= gcd;
+							bv /= gcd;
+							return true;
+						}
+					} else {
+						// Denominator is 1
+						// TODO: Make this only an identity?
+						expr = ExprNode(a->val);
+						return true;
 					}
 
 				} else {
@@ -64,7 +71,7 @@ ExprNode ExprManip::Simplify(const ExprNode& expr) {
 					bool evaluated = true;
 					Int resultNum;
 
-					switch (result.op) {
+					switch (expr.op) {
 					case OP_NEG:
 						resultNum = -a->val.intVal;
 						break;
@@ -78,16 +85,19 @@ ExprNode ExprManip::Simplify(const ExprNode& expr) {
 						evaluated = false;
 					}
 
-					if (evaluated)
-						result = ExprNode(resultNum);
+					if (evaluated) {
+						expr = ExprNode(resultNum);
+						return true;
+					}
 				}
 			}
 
 		}
-	} else if (result.children.size() == 1) {
-		ExprNode firstNode = result.children[0];
-		result = firstNode;
+	} else if (expr.children.size() == 1) {
+		ExprNode firstNode = expr.children[0];
+		expr = firstNode;
+		return true;
 	}
 
-	return result;
+	return false;
 }

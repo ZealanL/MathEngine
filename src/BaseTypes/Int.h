@@ -38,6 +38,9 @@ struct Int {
 
 	static Int FromString(const std::string& string);
 
+	// NOTE: Returns -1 if the number is not a perfect square
+	Int Sqrt() const;
+
 	std::string ToString() const {
 		return std::to_string(val);
 	}

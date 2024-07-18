@@ -2,7 +2,6 @@
 
 struct AStarNode {
 	ExprNode expr;
-	bool hashUpdated = false;
 
 	AStarNode* parent = NULL;
 	std::vector<AStarNode*> neighbors;
@@ -20,7 +19,11 @@ struct AStarNode {
 	}
 
 	bool operator<(const AStarNode& other) const {
-		return fCost < other.fCost;
+		if (fCost != other.fCost) {
+			return fCost < other.fCost;
+		} else {
+			return this < &other;
+		}
 	}
 
 	friend std::ostream& operator<<(std::ostream& stream, const AStarNode& node) {
@@ -35,7 +38,7 @@ ExprSearch::Result ExprSearch::FindBest(const ExprNode& expr, SearchDistFn distF
 	auto nodeCmpFn = [](const AStarNode* a, const AStarNode* b) { return *a < *b; };
 	std::set<AStarNode*, decltype(nodeCmpFn)> open = {};
 
-	std::unordered_map<int64_t, AStarNode*> nodeLookup = {};
+	std::unordered_map<uint64_t, AStarNode*> nodeLookup = {};
 
 	// Can't use nodeLookup, otherwise a hash collision would cause a memory leak
 	std::vector<AStarNode*> allocatedNodes = {};
@@ -62,7 +65,7 @@ ExprSearch::Result ExprSearch::FindBest(const ExprNode& expr, SearchDistFn distF
 		// If needed, generate neighbors
 		if (!cur->neighborsGenerated) {
 			cur->neighborsGenerated = true;
-
+			
 			auto transforms = ExprManip::FindTransformations(cur->expr);
 			for (ExprNode& neighborExpr : transforms) {
 				neighborExpr.UpdateHash();
@@ -82,7 +85,7 @@ ExprSearch::Result ExprSearch::FindBest(const ExprNode& expr, SearchDistFn distF
 				cur->neighbors.push_back(neighbor);
 			}
 		}
-		
+
 		// Add non-closed neighbors to open
 		for (auto& neighbor : cur->neighbors) {
 			if (neighbor->closed)

@@ -19,7 +19,7 @@ public:
 	explicit ExprNode(int op, const std::vector<ExprNode>& children) : op(op), children(children) {}
 
 	uint64_t GetHash() const { return hash; };
-	void UpdateHash();
+	uint64_t UpdateHash();
 
 	bool IsLeaf() const { return children.empty(); }
 

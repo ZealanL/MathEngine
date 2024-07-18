@@ -1,6 +1,6 @@
 #include "Hash.h"
 
-int64_t Hash::HashBytes(const void* data, size_t size) {
+uint64_t Hash::HashBytes(const void* data, size_t size) {
 	// https://gist.github.com/hwei/1950649d523afd03285c
 
 	// https://bigprimes.org/
@@ -9,7 +9,7 @@ int64_t Hash::HashBytes(const void* data, size_t size) {
 
 	uint8_t* bytes = (uint8_t*)data;
 
-	int64_t result = OFFSET_BASIS;
+	uint64_t result = OFFSET_BASIS;
 	for (size_t i = 0; i < size; i++) {
 		result ^= bytes[i];
 		result *= FNV_PRIME;

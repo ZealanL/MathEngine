@@ -1,7 +1,16 @@
 #include "ExprNode.h"
 
-void ExprNode::UpdateHash() {
+uint64_t ExprNode::UpdateHash() {
 	HashBuilder hb = HashBuilder(IsVal(), op, children.size());
+
+	if (IsVal()) {
+		hb += val.IsVar();
+		if (val.IsVar()) {
+			hb += val.varVal.GetHash();
+		} else {
+			hb += val.intVal.val;
+		}
+	}
 
 	for (int i = 0; i < children.size(); i++) {
 		hb.Add(i);
@@ -10,6 +19,7 @@ void ExprNode::UpdateHash() {
 	}
 
 	hash = hb.Get();
+	return hash;
 }
 
 bool ExprNode::operator==(const ExprNode& other) const {
